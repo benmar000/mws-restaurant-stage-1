@@ -275,3 +275,14 @@ nav h1 a {
 #restaurant-hours td {
   color: #666;
 }
+
+.filter-selects {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.filter-label {
+  display: none;
+}
