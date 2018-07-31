@@ -163,7 +163,6 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   const imgurlbase = DBHelper.imageUrlForRestaurant(restaurant);
-  console.log(imgurlbase);
   const imgparts = imgurlbase.split('.');
   const imgurl1x = imgparts[0]+"-tiles_1x."+imgparts[1];
   const imgurl2x = imgparts[0]+"-tiles_2x."+imgparts[1];
