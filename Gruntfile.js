@@ -33,36 +33,40 @@ module.exports = function(grunt) {
                 options: {
                     // Task-specific options go here.
                     sizes: [{
-                        name: "banner_1x",
+                        name: "banners",
                         width: 500,
                         height: 219,
                         quality: 77,
-                        aspectRatio: false
+                        aspectRatio: false,
+                        suffix: "_1x"
                     },
                     {
-                        name: "banner_2x",
+                        name: "banners",
                         width: 800,
                         height: 350,
                         quality: 77,
-                        aspectRatio: false
+                        aspectRatio: false,
+                        suffix: "_2x"
                     },
                     {
-                        name: "tile_1x",
+                        name: "tiles",
                         width: 300,
                         quality: 77,
+                        suffix: "_1x"
                     },
                     {
-                        name: 'tile_2x',
+                        name: 'tiles',
                         width: 600,
                         quality: 77,
+                        suffix: "_2x"
                     }]
                 },
                 files: [{
                     expand: true,
                     src: ['**.{jpg,png,gif}'],
                     cwd: 'img/',
-                    //dest: 'img/tmp/'
-                    custom_dest: 'img/build/{%= name %}'
+                    dest: 'img/build/'
+                    //custom_dest: 'img/build/{%= name %}'
                 }]
             }
         }
