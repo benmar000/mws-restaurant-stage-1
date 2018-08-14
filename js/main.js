@@ -168,6 +168,7 @@ createRestaurantHTML = (restaurant) => {
   const imgurl2x = imgparts[0]+"-tiles_2x."+imgparts[1];
   image.src = imgurl1x;
   image.srcset = `${imgurl1x} 300w, ${imgurl2x} 600w`;
+  image.alt = "";
   li.append(image);
 
   const div = document.createElement("div");
@@ -183,12 +184,19 @@ createRestaurantHTML = (restaurant) => {
   div.append(neighborhood);
 
   const address = document.createElement('p');
-  address.innerHTML = restaurant.address;
+  address.innerHTML = restaurant.address.split(',').shift(2);
   div.append(address);
 
-  const more = document.createElement('a');
+  const zipcode = document.createElement('p');
+  zipcode.innerHTML = restaurant.address.split(',').pop();
+  div.append(zipcode);
+
+  const more = document.createElement('button');
   more.innerHTML = 'View Details';
-  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.onclick = function() {
+    const url = DBHelper.urlForRestaurant(restaurant);
+    window.location = url;
+  };
   div.append(more)
 
   return li
