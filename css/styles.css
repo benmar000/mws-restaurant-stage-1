@@ -146,6 +146,10 @@ nav h1 a {
   background-color: #ccc;
 }
 
+.map-info-label{
+  display: none;
+}
+
 /* ====================== Restaurant Filtering ====================== */
 
 .filter-options {
@@ -296,6 +300,10 @@ nav h1 a {
 #restaurant-address {
   font-size: 12pt;
   margin: 10px 0px;
+}
+
+.restaurant-info-label {
+  display: none;
 }
 
 #restaurant-cuisine {

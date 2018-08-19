@@ -168,7 +168,7 @@ createRestaurantHTML = (restaurant) => {
   const imgurl2x = imgparts[0]+"-tiles_2x."+imgparts[1];
   image.src = imgurl1x;
   image.srcset = `${imgurl1x} 300w, ${imgurl2x} 600w`;
-  image.alt = "";
+  image.alt = restaurant.name;
   li.append(image);
 
   const div = document.createElement("div");
@@ -177,6 +177,7 @@ createRestaurantHTML = (restaurant) => {
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
+  name.id = restaurant.name;
   div.append(name);
 
   const neighborhood = document.createElement('p');
@@ -193,6 +194,7 @@ createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('button');
   more.innerHTML = 'View Details';
+  more.setAttribute("aria-labelledby", restaurant.name);
   more.onclick = function() {
     const url = DBHelper.urlForRestaurant(restaurant);
     window.location = url;
