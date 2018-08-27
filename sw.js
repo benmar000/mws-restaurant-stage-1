@@ -1,4 +1,6 @@
-var CACHE_NAME = 'mws-cache-v1';
+// Writen using notes taken from work from Doug Brown and Matt Gaunt
+
+var cache = 'mws-cache-v1';
 var urlsToCache = [
   '/',
   '/css/styles.css',
@@ -13,9 +15,8 @@ var urlsToCache = [
 ]
 
 self.addEventListener('install', function (event) {
-  // Perform install steps
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches.open(cache)
       .then(function (cache) {
         console.log('Opened cache');
         return cache.addAll(urlsToCache);
@@ -26,15 +27,14 @@ self.addEventListener('install', function (event) {
 });
 
 self.addEventListener('fetch', function (event) {
-  // Perform fetch steps
   event.respondWith(
     caches.match(event.request)
       .then(function (response) {
-        // Cache hit - return response
+        // Found in cache 
         if (response) {
           return response;
         }
-        // Cache not hit
+        // Not found in catch
 
         // Clone the request since it's a stream that can only be used once. 
         var fetchRequest = event.request.clone();
