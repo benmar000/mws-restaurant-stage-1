@@ -357,6 +357,7 @@ nav h1 a {
   overflow: hidden;
   padding: 20px 40px 20px;
   position: relative;
+  border-radius: 12px;
 }
 
 #reviews-list li p {
@@ -390,12 +391,25 @@ nav h1 a {
 /* ====================== Tablet ====================== */
 
 @media all and (max-width: 768px) { 
-
+  
 }
 
 /* ====================== Smartphone ====================== */
 
 @media all and (max-width: 480px) { 
+  #map {
+    height: 300px;
+  }
+  
+  #restaurants-list li {
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .filter-selects {
+    justify-content: center;
+  }
+
   #restaurant-container, #reviews-container {
     border-bottom: 1px solid #d9d9d9;
     border-top: 1px solid #fff;
