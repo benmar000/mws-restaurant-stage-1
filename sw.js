@@ -1,5 +1,3 @@
-// Writen using notes taken from work from Doug Brown and Matt Gaunt
-
 var siteCache = 'mws-cache-v1';
 var urlsToCache = [
   '/',
