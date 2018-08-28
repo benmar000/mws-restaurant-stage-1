@@ -91,11 +91,11 @@ nav {
   /* height: 80px; */
   background-color: #252831;
   text-align: center;
-  padding: 15px 0;
 }
 
 nav h1 {
   margin: auto;
+  padding: 15px 0;
 }
 
 nav h1 a {
@@ -113,6 +113,7 @@ nav h1 a {
   font-size: 17px;
   margin: 0;
   /* width: 100%; */
+  text-align: left;
 }
 
 /* Display list items side by side */
