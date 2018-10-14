@@ -35,37 +35,20 @@ class DBHelper {
     //   }
     // };
     // xhr.send();
-    // let restaurantFetchURL;
-    // if (!id) {
-    //   restaurantFetchURL = DBHelper.DATABASE_URL;
-    // } else {
-    //   restaurantFetchURL = `${DBHelper.DATABASE_URL}/${id}`;
-    // }
-    // fetch(restaurantFetchURL, { method: 'GET' })
-    //   .then(response => {
-    //     if (response.status === 200) { // Got a success response from server!
-    //       response.json().then(restaurants => {
-    //         callback(null, restaurants);
-    //       });
-    //     } 
-    //   }).catch(error => callback(`Error: ${error}`, null));
-    let fetchURL;
+    let restaurantFetchURL;
     if (!id) {
-      fetchURL = DBHelper.DATABASE_URL;
+      restaurantFetchURL = DBHelper.DATABASE_URL;
     } else {
-      fetchURL = DBHelper.DATABASE_URL + '/' + id;
+      restaurantFetchURL = `${DBHelper.DATABASE_URL}/${id}`;
     }
-    fetch(fetchURL, { method: 'GET' })
+    fetch(restaurantFetchURL, { method: 'GET' })
       .then(response => {
-        //console.log("dbhelper response: ", response.clone().text().then(text => {console.log(text)}));
-        response.json().then(restaurants => {
-          console.log("restaurants JSON: ", restaurants);
-          callback(null, restaurants);
-        });
-      })
-      .catch(error => {
-        callback(`Request failed. Returned ${error}`, null);
-      });
+        if (response.status === 200) { // Got a success response from server!
+          response.json().then(restaurants => {
+            callback(null, restaurants);
+          });
+        } 
+      }).catch(error => callback(`Error: ${error}`, null));
   }
 
   /**

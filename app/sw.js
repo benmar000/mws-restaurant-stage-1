@@ -1,3 +1,10 @@
+import idb from './js/idb' type="module";
+
+var dbPromise = idb.open('test-db', 1, function(upgradeDb) {
+  var keyValStore = upgradeDb.createObjectStore('keyval');
+  keyValStore.put("world", "hello");
+});
+
 var siteCache = 'mws-cache-v1';
 var urlsToCache = [
   '/',
