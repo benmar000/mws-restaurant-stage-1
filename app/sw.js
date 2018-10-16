@@ -7,16 +7,13 @@ var dbPromise = idb.open('test-db', 1, function(upgradeDb) {
 
 var siteCache = 'mws-cache-v1';
 var urlsToCache = [
-  '/',
   '/css/styles.css',
-  '/js/',
   '/js/main.js',
   '/js/restaurant_info.js',
   '/js/dbhelper.js',
   '/js/sw/register.js',
   '/index.html',
-  '/restaurant.html',
-  '/data/restaurants.json'
+  '/restaurant.html'
 ]
 
 self.addEventListener('install', function (event) {
@@ -58,7 +55,11 @@ self.addEventListener('fetch', function (event) {
             caches.open(siteCache)
               .then(function (cache) {
                 console.log('saving to cache');
-                cache.put(event.request, fetchResponse);
+                // This prevents cache.put from attempting to cache POST requests
+                if (fetchResponse.url.indexOf("browser-sync") === -1) {
+                  cache.put(event.request, fetchResponse);
+                }
+                return fetchResponse;
               });
             return response;
           }).catch(function (error) {
