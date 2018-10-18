@@ -136,7 +136,8 @@ gulp.task('serve', () => {
     ]).on('change', reload);
 
     gulp.watch('app/css/**/*.css', ['styles']);
-    gulp.watch('app/js/**/*.js', ['scripts']);
+    gulp.watch(['app/js/**/*.js'], ['scripts']);
+    gulp.watch(['app/sw.js'], ['sw', 'scripts']);
     gulp.watch('app/fonts/**/*', ['fonts']);
     gulp.watch('bower.json', ['wiredep', 'fonts']);
   });
@@ -166,7 +167,8 @@ gulp.task('serve:test', ['scripts'], () => {
     }
   });
 
-  gulp.watch('app/js/**/*.js', ['scripts']);
+  gulp.watch(['app/js/**/*.js'], ['scripts']);
+  gulp.watch(['app/sw.js'], ['sw', 'scripts']);
   gulp.watch(['test/spec/**/*.js', 'test/index.html']).on('change', reload);
   gulp.watch('test/spec/**/*.js', ['lint:test']);
 });

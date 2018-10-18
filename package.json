@@ -54,6 +54,7 @@
   "dependencies": {
     "@babel/cli": "^7.1.2",
     "@babel/preset-es2015": "^7.0.0-beta.53",
-    "idb": "^2.1.3"
+    "idb": "^2.1.3",
+    "lint": "^1.1.2"
   }
 }

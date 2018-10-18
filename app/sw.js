@@ -1,8 +1,9 @@
 import idb from 'idb';
 
-var dbPromise = idb.open('test-db', 1, function(upgradeDb) {
-  var keyValStore = upgradeDb.createObjectStore('keyval');
-  keyValStore.put("world", "hello");
+var dbPromise = idb.open('mws-db', 1, function(upgradeDb) {
+  if (!upgradeDb.objectStoreNames.contains('restaurants')) {
+    var restaurantsOS = upgradeDb.createObjectStore('restaurants', {keyPath: 'id'});
+  }
 });
 
 var siteCache = 'mws-cache-v1';
@@ -20,7 +21,7 @@ self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(siteCache)
       .then(function (cache) {
-        console.log('Opened cache');
+        console.log('Opening cache');
         return cache.addAll(urlsToCache);
       }).catch(function (error) {
         console.log('Failed to open cache with error: ', error)
@@ -28,7 +29,51 @@ self.addEventListener('install', function (event) {
   );
 });
 
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch', function(event) {
+  var requestURL = new URL(event.request.url);
+
+  if (requestURL.port === '1337') {
+    var id = -1;
+    console.log(`Request URL is: ${requestURL}`);
+    dbRequest(event, id);
+  }
+  else {
+    cacheRequest(event)
+  }
+});
+
+var dbRequest = function(event, id) {
+  event.respondWith(dbPromise.then(function(db){
+    var tx = db.transaction('restaurants')
+    var store = tx.objectStore('restaurants')
+    return store.get(id);
+  }).then(function(data){
+    //console.log(`data : ${data} and data.data is: ${data.data}`)
+    if (data){
+      return data && data.data;
+    } 
+    fetch(event.request)
+    .then(function(fetchResponse){ 
+      return fetchResponse.json();
+    })
+    .then(function(json){
+      return dbPromise.then(function(db){
+        var tx = db.transaction('restaurants', 'readwrite');
+        var store = tx.objectStore('restaurants');
+        store.put({id: id, data: json});
+        return json;
+      });
+    });
+  }).then(function(response){
+    return new Response(JSON.stringify(response));
+  }).catch(function(error){
+    console.error(`Received error: "${error}" when fetching data`);
+    return new Response(`Received error: ${error} when fetching data`, {status: 500});
+  }));
+};
+
+
+var cacheRequest = function(event){
   event.respondWith(
     caches.match(event.request)
       .then(function (response) {
@@ -47,8 +92,7 @@ self.addEventListener('fetch', function (event) {
             // response type 'basic' prevents third party resources from saving
             if (!response || response.status !== 200 || response.type !== 'basic') {
               return response;
-            }
-
+            }             
             // Clone the response since it's a stream that can only be used once
             var fetchResponse = response.clone();
 
@@ -66,12 +110,11 @@ self.addEventListener('fetch', function (event) {
             console.log(error);
             return new Response('Application is not connected to the internet', {
               status: 404,
-              statusText: 'Application is not connected to the internet',
+              statusText: 'Application is not connected to the internet :(',
             });
           })
       })
   )
-});
-
+}
 
 
