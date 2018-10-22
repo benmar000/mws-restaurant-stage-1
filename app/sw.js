@@ -33,8 +33,10 @@ self.addEventListener('fetch', function(event) {
   var requestURL = new URL(event.request.url);
 
   if (requestURL.port === '1337') {
+    // console.log(`url match: ${event.request.url.match(/\d+$/)}`);
+    // var id = event.request.url.match(/\d+$/)[0] || -1;
+    // console.log(`id is: ${id}`)
     var id = -1;
-    console.log(`Request URL is: ${requestURL}`);
     dbRequest(event, id);
   }
   else {
@@ -44,8 +46,8 @@ self.addEventListener('fetch', function(event) {
 
 var dbRequest = function(event, id) {
   event.respondWith(dbPromise.then(function(db){
-    var tx = db.transaction('restaurants')
-    var store = tx.objectStore('restaurants')
+    var tx = db.transaction('restaurants');
+    var store = tx.objectStore('restaurants');
     return store.get(id);
   }).then(function(data){
     //console.log(`data : ${data} and data.data is: ${data.data}`)
