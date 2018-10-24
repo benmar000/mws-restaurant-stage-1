@@ -1,3 +1,8 @@
 module.exports = {
-    "extends": "google"
+    "extends": "standard", 
+    "globals": { 
+        "fetch": false, 
+        "caches": false,
+        "Response": false,
+        "self": false }
 };
