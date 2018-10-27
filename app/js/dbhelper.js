@@ -41,12 +41,19 @@ class DBHelper {
     }
     fetch(restaurantFetchURL, { method: 'GET' })
       .then(response => {
+        console.log(`// DBHelper Fetch. Response is:`)
+        console.log(response.clone())
+        // console.log(`// Convert to JSON`)
+        // console.log(response.clone().json())
         if (response.status === 200) { // Got a success response from server!
           response.json().then(restaurants => {
             callback(null, restaurants)
           })
         }
       }).catch(error => callback(`Error: ${error}`, null))
+    // fetch('http://localhost:1337/restaurants', { method: 'get' })
+    //   .then(response => response.json()
+    //     .then(data => console.log(data)))
   }
 
   /**
@@ -58,14 +65,15 @@ class DBHelper {
       if (error) {
         callback(error, null)
       } else {
-        const restaurant = restaurants.find(r => r.id == id)
+        // const restaurant = restaurants.find(r => r.id == id)
+        const restaurant = restaurants // fetchRestaurants now uses id to fetch JSON for individual restaurants
         if (restaurant) { // Got the restaurant
           callback(null, restaurant)
         } else { // Restaurant does not exist in the database
           callback('Restaurant does not exist', null)
         }
       }
-    })
+    }, id) // id here was missing. It is now passed to fetchRestaurants which uses id in DB
   }
 
   /**
