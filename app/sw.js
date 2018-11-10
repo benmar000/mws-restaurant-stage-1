@@ -1,4 +1,6 @@
-import idb from 'idb'
+// import idb from 'idb'
+importScripts('/js/idb.js')
+importScripts('/js/store.js')
 // import { resolve } from 'dns'
 
 var dbPromise = idb.open('mws-db', 1, function (upgradeDb) {
@@ -9,8 +11,8 @@ var dbPromise = idb.open('mws-db', 1, function (upgradeDb) {
     upgradeDb.createObjectStore('reviews', { keyPath: 'id' })
   }
 
-  if (!upgradeDb.objectStoreNames.contains('reviewsToPost')) {
-    upgradeDb.createObjectStore('reviewsToPost', { keyPath: 'id', autoIncrement: true })
+  if (!upgradeDb.objectStoreNames.contains('outbox')) {
+    upgradeDb.createObjectStore('outbox', { keyPath: 'id', autoIncrement: true })
   }
 })
 
@@ -40,25 +42,56 @@ self.addEventListener('install', function (event) {
   )
 })
 
-self.addEventListener('message', function (event) {
-  console.log('SW Received Message: ')
-  console.log('sw sending POST')
-  fetch('http://localhost:1337/reviews/', {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8'
-    },
-    body: JSON.stringify(event.data)
-  }).catch(() => {
-    this.console.log('sw could not post review to server. Saving to idb')
-    dbPromise.then(function (db) {
-      var tx = db.transaction('reviewsToPost', 'readwrite')
-      var store = tx.objectStore('reviewsToPost')
-      store.put({ data: event.data })
-    })
-  })
+self.addEventListener('sync', (event) => {
+  console.log('sw listening to background sync')
+  event.waitUntil(
+    store.outbox('readonly').then((outbox) => {
+      return outbox.getAll()
+    }).then((reviews) => {
+      // post reviews to server
+      return Promise.all(reviews.map((review) => {
+        return fetch('http://localhost:1337/reviews/', {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(review)
+        }).then((response) => {
+          return response.json()
+        }).then((data) => {
+          console.log('SW Post data: ')
+          console.log(data)
+          if (data.createdAt) {
+            console.log('background sync fetch got successful response. Deleting from outbox')
+            return store.outbox('readwrite')
+              .then((outbox) => outbox.delete(review.id))
+          }
+        })
+      }))
+    }).catch((error) => console.log(error))
+  )
 })
+
+// self.addEventListener('message', function (event) {
+//   console.log('SW Received Message: ')
+//   console.log('sw sending POST')
+//   fetch('http://localhost:1337/reviews/', {
+//     method: 'POST',
+//     mode: 'cors',
+//     headers: {
+//       'Content-Type': 'application/json; charset=utf-8'
+//     },
+//     body: JSON.stringify(event.data)
+//   }).catch(() => {
+//     this.console.log('sw could not post review to server. Saving to idb')
+//     dbPromise.then(function (db) {
+//       var tx = db.transaction('reviewsToPost', 'readwrite')
+//       var store = tx.objectStore('reviewsToPost')
+//       store.put({ data: event.data })
+//     })
+//   })
+// })
 
 self.addEventListener('fetch', function (event) {
   console.log('Service worker handling fetch request')

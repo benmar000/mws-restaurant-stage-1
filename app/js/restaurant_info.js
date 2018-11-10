@@ -5,22 +5,64 @@ var newMap
 /**
  * Initialize map as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {
+
+document.addEventListener('DOMContentLoaded', function (event) {
+  if ('serviceWorker' in navigator) {
+    // is it necessary to register sw here?
+    navigator.serviceWorker.register('/sw.js').then(function (reg) {
+      if ('sync' in reg) {
+        console.log('starting browser sync')
+        const form = document.querySelector('form')
+        const restaurantId = form.querySelector('#reviewRestaurantId')
+        const reviewName = form.querySelector('#reviewName')
+        const reviewRating = form.querySelector('#reviewRating')
+        const reviewComment = form.querySelector('#reviewComment')
+
+        form.addEventListener('submit', (event) => {
+          console.log('listening to submit event')
+          event.preventDefault()
+          const reviewFormData = {
+            'restaurant_id': restaurantId.value,
+            'name': reviewName.value,
+            'rating': reviewRating.value,
+            'comments': reviewComment.value
+          }
+          store.outbox('readwrite')
+            .then((outbox) => outbox.put(reviewFormData))
+            .then(() => {
+              // Clear form and Do background sync!
+              reviewName.value = ''
+              reviewRating.value = ''
+              reviewComment.value = ''
+              return reg.sync.register('outbox')
+            }).catch((error) => {
+              console.log(`Something went wrong with the db or sync reg: ${error}`)
+              console.log(form.submit())
+            })
+        })
+      }
+    }).catch(function (err) {
+      console.error(err) // the Service Worker didn't install correctly
+    })
+  }
   initMap()
 })
 
-const form = document.querySelector('form')
-form.addEventListener('submit', (event) => {
-  event.preventDefault()
+// window.addEventListener('load', function () {
+//   function updateOnlineStatus (event) {
+//     if (navigator.onLine) {
+//       // handle online status
+//       console.log('App is online - have SW upload pending reviews to server')
+//       navigator.serviceWorker.controller.postMessage('online')
+//     } else {
+//       // handle offline status
+//       console.log('App is offline')
+//     }
+//   }
 
-  const myFormData = {
-    'restaurant_id': form['restaurant_id'].value,
-    'name': form['name'].value,
-    'rating': form['rating'].value,
-    'comments': form['comments'].value
-  }
-  navigator.serviceWorker.controller.postMessage(myFormData)
-})
+//   window.addEventListener('online', updateOnlineStatus)
+//   window.addEventListener('offline', updateOnlineStatus)
+// })
 
 /**
  * Initialize leaflet map

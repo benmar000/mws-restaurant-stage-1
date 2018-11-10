@@ -74,13 +74,13 @@
 
     <section id="reviews-form-container">
       <form action="http://localhost:1337/reviews/" method="POST">
-        <input name="restaurant_id" value=1>  
+        <input name="restaurant_id" id="reviewRestaurantId" value=1>  
 
         <label for="reviewName">Your Name</label>
-          <input name="name" type="text" id="reviewName" placeholder="John Smith" minlength="2" required autocomplete="name">
+          <input name="name" type="text" id="reviewName" placeholder="John Smith" minlength="2" required autocomplete="name" value="Ben">
 
         <label for="reviewRating">Rating</label>
-          <input name ="rating" id="reviewRating" type="number" required placeholder=5 min=1 max=5 step=1>
+          <input name ="rating" id="reviewRating" type="number" required placeholder=5 min=1 max=5 step=1 value="5">
        
         <label for="reviewComment">Comments</label>
           <textarea name="comments" id="reviewComment" rows="10" cols="30"></textarea>
@@ -104,8 +104,12 @@
     crossorigin=""></script>
   <!-- Beginning scripts -->
   <!--  Service Worker registration -->
-  <script type="application/javascript" charset="utf-8" src="js/sw/register.js"></script>  
+  <!-- <script type="application/javascript" charset="utf-8" src="js/sw/register.js"></script>   -->
+  <!-- idb library -->
+  <script type="text/javascript" src="/js/idb.js"></script>
   <!-- Database helpers -->
+  <script type="text/javascript" src="/js/store.js"></script>
+
   <script type="text/javascript" src="js/dbhelper.js"></script>
   <!-- Main javascript file -->
   <script type="text/javascript" src="js/restaurant_info.js"></script>
