@@ -325,7 +325,7 @@ nav h1 a {
   width: 100%;
 }
 
-#restaurant-container, #reviews-container {
+#restaurant-container, #reviews-container, #reviews-form-container {
   border-bottom: 1px solid #d9d9d9;
   border-top: 1px solid #fff;
   padding: 15px 40px 20px;
@@ -336,7 +336,7 @@ nav h1 a {
   padding: 30px 20px 80px;
 }
 
-#reviews-container h3 {
+#reviews-container h3, #reviews-form-container h3 {
   color: #0D3D56  ;
   font-size: 24pt;
   font-weight: 300;

@@ -71,6 +71,23 @@
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
     </section>
+
+    <section id="reviews-form-container">
+      <form action="http://localhost:1337/reviews/" method="POST">
+        <input name="restaurant_id" value=1>  
+
+        <label for="reviewName">Your Name</label>
+          <input name="name" type="text" id="reviewName" placeholder="John Smith" minlength="2" required autocomplete="name">
+
+        <label for="reviewRating">Rating</label>
+          <input name ="rating" id="reviewRating" type="number" required placeholder=5 min=1 max=5 step=1>
+       
+        <label for="reviewComment">Comments</label>
+          <textarea name="comments" id="reviewComment" rows="10" cols="30"></textarea>
+
+        <input type="submit" value="Submit">
+      </form>  
+    </section>
     <!-- End reviews -->
   </main>
   <!-- End main -->

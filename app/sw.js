@@ -5,6 +5,13 @@ var dbPromise = idb.open('mws-db', 1, function (upgradeDb) {
   if (!upgradeDb.objectStoreNames.contains('restaurants')) {
     var restaurantsOS = upgradeDb.createObjectStore('restaurants', { keyPath: 'id' })
   }
+  if (!upgradeDb.objectStoreNames.contains('reviews')) {
+    upgradeDb.createObjectStore('reviews', { keyPath: 'id' })
+  }
+
+  if (!upgradeDb.objectStoreNames.contains('reviewsToPost')) {
+    upgradeDb.createObjectStore('reviewsToPost', { keyPath: 'id', autoIncrement: true })
+  }
 })
 
 var siteCache = 'mws-cache-v1'
@@ -33,6 +40,26 @@ self.addEventListener('install', function (event) {
   )
 })
 
+self.addEventListener('message', function (event) {
+  console.log('SW Received Message: ')
+  console.log('sw sending POST')
+  fetch('http://localhost:1337/reviews/', {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8'
+    },
+    body: JSON.stringify(event.data)
+  }).catch(() => {
+    this.console.log('sw could not post review to server. Saving to idb')
+    dbPromise.then(function (db) {
+      var tx = db.transaction('reviewsToPost', 'readwrite')
+      var store = tx.objectStore('reviewsToPost')
+      store.put({ data: event.data })
+    })
+  })
+})
+
 self.addEventListener('fetch', function (event) {
   console.log('Service worker handling fetch request')
   var requestURL = new URL(event.request.url)
@@ -42,53 +69,39 @@ self.addEventListener('fetch', function (event) {
     if (requestURL.href.match(/\d+$/)) {
       id = requestURL.href.match(/\d+$/)[0]
     }
-    // var id = requestURL.href.match(/\d+$/)[0] || -1;
     console.log(`SW Fetching ID: ${id}`)
-    //
-    dbRequest(event, id)
+    var type
+    if (requestURL.href.includes('restaurants')) {
+      type = 'restaurants'
+      dbRequest(event, id, type)
+    // } else if (requestURL.href.includes('reviews')) {
+    } else {
+      console.log('SW calling dbRequest for reviews JSON')
+      type = 'reviews'
+      dbRequest(event, id, type)
+    }
   } else {
     cacheRequest(event)
   }
 })
 
-var dbRequest = function (event, id) {
+var dbRequest = function (event, id, type) {
   event.respondWith(dbPromise.then(function (db) {
-    var tx = db.transaction('restaurants')
-    var store = tx.objectStore('restaurants')
+    var tx = db.transaction(type)
+    var store = tx.objectStore(type)
     return store.get(id)
   }).then(function (data) {
-    // // console.log(`data : ${data} and data.data is: ${data.data}`)
-    // var message = 'Message: '
-    // if (data) {
-    //   message += 'Retrieved data from DB'
-    //   return (data && data.data)
-    // } else {
-    //   message += 'SW fetching JSON'
-    //   fetch(event.request)
-    //     .then(function (fetchResponse) {
-    //       // console.log(`//SW Fetch response is:`)
-    //     // console.log(fetchResponse.clone())
-    //       return fetchResponse.json()
-    //     })
-    //     .then(function (json) {
-    //       return dbPromise.then(function (db) {
-    //         var tx = db.transaction('restaurants', 'readwrite')
-    //         var store = tx.objectStore('restaurants')
-    //         store.put({ id: id, data: json })
-    //         return json
-    //       })
-    //     })
-    // }
-    // console.log(message)
     return (data && data.data) || fetch(event.request)
       .then(function (response) {
+        console.log('dbRequest response is: ')
+        console.log(response.clone())
         return response.json()
       })
       .then(function (json) {
         return dbPromise
           .then(function (db) {
-            var tx = db.transaction('restaurants', 'readwrite')
-            var store = tx.objectStore('restaurants')
+            var tx = db.transaction(type, 'readwrite')
+            var store = tx.objectStore(type)
             store.put({ id: id, data: json })
             console.log('saved JSON to db')
             // parseDBData(json)

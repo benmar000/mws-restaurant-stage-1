@@ -7,15 +7,16 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
 
-  static get DATABASE_URL () {
+  static get DATABASE_RESTAURANTS_URL () {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants`
   }
-  /*
-  static get DATABASE_URL() {
-    return `https://benmar000.github.io/mws-restaurant-stage-1/data/restaurants.json`;
+
+  static get DATABASE_REVIEWS_URL () {
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/reviews`
   }
-  */
+
   /**
    * Fetch all restaurants.
    */
@@ -35,14 +36,14 @@ class DBHelper {
     // xhr.send();
     let restaurantFetchURL
     if (!id) {
-      restaurantFetchURL = DBHelper.DATABASE_URL
+      restaurantFetchURL = DBHelper.DATABASE_RESTAURANTS_URL
     } else {
-      restaurantFetchURL = `${DBHelper.DATABASE_URL}/${id}`
+      restaurantFetchURL = `${DBHelper.DATABASE_RESTAURANTS_URL}/${id}`
     }
     fetch(restaurantFetchURL, { method: 'GET' })
       .then(response => {
-        console.log(`// DBHelper Fetch. Response is:`)
-        console.log(response.clone())
+        // console.log(`// DBHelper Fetch. Response is:`)
+        // console.log(response.clone())
         // console.log(`// Convert to JSON`)
         // console.log(response.clone().json())
         if (response.status === 200) { // Got a success response from server!
@@ -207,4 +208,41 @@ class DBHelper {
     );
     return marker;
   } */
+
+  // Reviews functions
+
+  static fetchReviews (callback, id) {
+    let reviewFetchURL
+    if (!id) {
+      reviewFetchURL = DBHelper.DATABASE_REVIEWS_URL
+    } else {
+      reviewFetchURL = `${DBHelper.DATABASE_REVIEWS_URL}/?restaurant_id=${id}`
+    }
+    fetch(reviewFetchURL, { method: 'GET' })
+      .then(response => {
+        console.log(`// DBHelper Fetched reviews`)
+        console.log(response.clone())
+        if (response.status === 200) { // Got a success response from server!
+          response.json().then(reviews => {
+            callback(null, reviews)
+          })
+        }
+      }).catch(error => callback(`Error: ${error}`, null))
+  }
+
+  static fetchReviewsById (id, callback) {
+    // fetch all restaurants with proper error handling.
+    DBHelper.fetchReviews((error, reviews) => {
+      if (error) {
+        callback(error, null)
+      } else {
+        const reviews = reviews
+        if (reviews) {
+          callback(null, restaurant)
+        } else { // Restaurant does not exist in the database
+          callback('Review does not exist', null)
+        }
+      }
+    }, id) // id here was missing. It is now passed to fetchRestaurants which uses id in DB
+  }
 }
