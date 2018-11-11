@@ -333,7 +333,7 @@ nav h1 a {
 }
 
 #reviews-container {
-  padding: 30px 20px 80px;
+  padding: 30px 20px 30px;
 }
 
 #reviews-container h3, #reviews-form-container h3 {
@@ -378,6 +378,27 @@ nav h1 a {
 
 .filter-label {
   display: none;
+}
+
+/* ====================== Review Form  ====================== */
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+#reviewRestaurantId {
+  display: none;
+}
+
+#reviewSubmit {
+  background-color: #252831;
+  /* color: #aaa; */
+  color: white;
+  font-size: 8pt;
+  padding: 10pt;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* ====================== Media Queries ====================== */

@@ -73,6 +73,8 @@
     </section>
 
     <section id="reviews-form-container">
+      <h3 id="reviews-form-title">Submit a new review:</h3>
+
       <form action="http://localhost:1337/reviews/" method="POST">
         <input name="restaurant_id" id="reviewRestaurantId" value=1>  
 
@@ -83,9 +85,9 @@
           <input name ="rating" id="reviewRating" type="number" required placeholder=5 min=1 max=5 step=1 value="5">
        
         <label for="reviewComment">Comments</label>
-          <textarea name="comments" id="reviewComment" rows="10" cols="30"></textarea>
+          <textarea name="comments" id="reviewComment" rows="10" cols="20"></textarea>
 
-        <input type="submit" value="Submit">
+        <input type="submit" id="reviewSubmit" value="Submit">
       </form>  
     </section>
     <!-- End reviews -->
