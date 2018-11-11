@@ -12,7 +12,7 @@ var dbPromise = idb.open('mws-db', 1, function (upgradeDb) {
   }
 
   if (!upgradeDb.objectStoreNames.contains('outbox')) {
-    upgradeDb.createObjectStore('outbox', { keyPath: 'id', autoIncrement: true })
+    upgradeDb.createObjectStore('outbox', { autoIncrement: true })
   }
 })
 
@@ -65,7 +65,20 @@ self.addEventListener('sync', (event) => {
           if (data.createdAt) {
             console.log('background sync fetch got successful response. Deleting from outbox')
             return store.outbox('readwrite')
-              .then((outbox) => outbox.delete(review.id))
+              .then((outbox) => outbox.clear())
+              .then(() => {
+                console.log('updating reviews list by fetching from server')
+                fetch(`http://localhost:1337/reviews/?restaurant_id=${review.restaurant_id}`)
+                  .then((response) => response.json())
+                  .then((json) => {
+                    return dbPromise
+                      .then(function (db) {
+                        var tx = db.transaction('reviews', 'readwrite').objectStore('reviews')
+                        tx.put({ id: review.restaurant_id, data: json })
+                        console.log('BG Sync saved JSON to db')
+                      })
+                  })
+              })
           }
         })
       }))
