@@ -447,7 +447,9 @@ form {
 #cuisines-select:hover,
 #cuisines-select:focus,
 #restaurants-list li button:hover, 
-#restaurants-list li button:focus {
+#restaurants-list li button:focus, 
+#reviewSubmit:hover,
+#reviewSubmit:focus {
   background: #C2185B;
   color: #FFFFFF;
   text-decoration: underline;

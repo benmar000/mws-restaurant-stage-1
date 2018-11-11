@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
           console.log('listening to submit event')
           event.preventDefault()
           const reviewFormData = {
-            'restaurant_id': restaurantId.value,
+            // 'restaurant_id': restaurantId.value,
+            'restaurant_id': getParameterByName('id'),
             'name': reviewName.value,
             'rating': reviewRating.value,
             'comments': reviewComment.value
