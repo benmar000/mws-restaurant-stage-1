@@ -48,6 +48,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
   initMap()
 })
 
+const channel = new BroadcastChannel('sw-messages')
+channel.addEventListener('message', event => {
+  console.log('Received', event.data)
+  location.reload()
+})
+
 // window.addEventListener('load', function () {
 //   function updateOnlineStatus (event) {
 //     if (navigator.onLine) {

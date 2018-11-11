@@ -1,6 +1,8 @@
 // import idb from 'idb'
 importScripts('/js/idb.js')
 importScripts('/js/store.js')
+importScripts('/js/dbhelper.js')
+
 // import { resolve } from 'dns'
 
 var dbPromise = idb.open('mws-db', 1, function (upgradeDb) {
@@ -76,6 +78,8 @@ self.addEventListener('sync', (event) => {
                         var tx = db.transaction('reviews', 'readwrite').objectStore('reviews')
                         tx.put({ id: review.restaurant_id, data: json })
                         console.log('BG Sync saved JSON to db')
+                        const channel = new BroadcastChannel('sw-messages')
+                        channel.postMessage({ title: 'Hello from SW' })
                       })
                   })
               })
@@ -85,6 +89,14 @@ self.addEventListener('sync', (event) => {
     }).catch((error) => console.log(error))
   )
 })
+
+function send_message_to_all_clients (msg) {
+  clients.matchAll().then(clients => {
+    clients.forEach(client => {
+      send_message_to_client(client, msg).then(m => console.log('SW Received Message: ' + m))
+    })
+  })
+}
 
 // self.addEventListener('message', function (event) {
 //   console.log('SW Received Message: ')
