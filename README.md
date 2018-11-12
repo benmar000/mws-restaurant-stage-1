@@ -24,7 +24,7 @@ This site presents a number of restaurants on a Mapbox map. Restaurants can be f
 
 
 ## Runtime Environment
-- Download the Sails server provided by Udacity (`https://github.com/udacity/mws-restaurant-stage-2`). 
+- Download the Sails server provided by Udacity (`https://github.com/udacity/mws-restaurant-stage-3`). 
 - Follow the Sails server readme and run the server using the console command: `node server`
 - Open this mws-restaurant project and run the terminal command: `npm install`
 - Once npm has finished installing dependencies, run the terminal command: `gulp serve`
@@ -32,3 +32,5 @@ This site presents a number of restaurants on a Mapbox map. Restaurants can be f
 
 ## Acknowledgments
 - Thanks to Doug Brown and Matt Gaunt for their Service Worker tutorials. 
+- Thanks to Jake Archibald and Phil Nash for their work and tutorials on Background Sync 
+
