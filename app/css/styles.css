@@ -429,6 +429,14 @@ form {
   letter-spacing: 1px;
 }
 
+#offline-alert {
+  width: 100%;
+  font: bold 1em sans-serif;
+  color: #FFF;
+  padding: 0.5em;
+  background: red;
+}
+
 /* ====================== Media Queries ====================== */
 
 

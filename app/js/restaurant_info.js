@@ -49,8 +49,26 @@ document.addEventListener('DOMContentLoaded', function (event) {
   initMap()
 })
 
-document.addEventListener('load', () => {
-  document.addEventListener('offline', () => console.log('Lost connection. New reviews will be upload when connection regained'))
+window.addEventListener('load', () => {
+  const container = document.getElementById('reviews-container')
+  const offlineAlert = document.createElement('div')
+  offlineAlert.id = 'offline-alert'
+  offlineAlert.innerHTML = 'App is offline - new reviews will be uploaded when back online'
+
+  function updateOnlineStatus (event) {
+    let status = navigator.onLine ? 'online' : 'offline'
+
+    if (status === 'offline') {
+      console.log('app is offline')
+      container.appendChild(offlineAlert)
+    } else {
+      console.log('app is online')
+      container.removeChild(offlineAlert)
+    }
+  }
+
+  window.addEventListener('online', updateOnlineStatus)
+  window.addEventListener('offline', updateOnlineStatus)
 })
 
 const channel = new BroadcastChannel('sw-messages')
