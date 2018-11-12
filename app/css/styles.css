@@ -386,6 +386,10 @@ nav h1 a {
   flex-direction: row;
 }
 
+.favorite-div label {
+  ;
+}
+
 .favorite-button{
   flex-grow: 1;
 }

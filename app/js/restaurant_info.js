@@ -49,6 +49,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
   initMap()
 })
 
+document.addEventListener('load', () => {
+  document.addEventListener('offline', () => console.log('Lost connection. New reviews will be upload when connection regained'))
+})
+
 const channel = new BroadcastChannel('sw-messages')
 channel.addEventListener('message', event => {
   console.log('Received', event.data)

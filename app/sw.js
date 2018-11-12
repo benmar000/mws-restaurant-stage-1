@@ -27,10 +27,12 @@ var urlsToCache = [
   '/js/dbhelper.js',
   '/js/sw/register.js',
   '/js/store.js',
+  '/js/idb.js',
   '/index.html',
   '/restaurant.html'
   // '/browser-sync/browser-sync-client.js?v=2.24.7'
 ]
+const channel = new BroadcastChannel('sw-messages')
 
 self.addEventListener('install', function (event) {
   console.log('Service worker is installing')
@@ -39,7 +41,8 @@ self.addEventListener('install', function (event) {
       .then(function (cache) {
         console.log('Opening cache')
         return cache.addAll(urlsToCache)
-      }).catch(function (error) {
+      }).then(() => channel.postMessage({ title: 'Hello from SW' }))
+      .catch(function (error) {
         console.error('Failed to open cache with error: ', error)
       })
   )
@@ -60,6 +63,7 @@ function reviewOutbox (event) {
       return outbox.getAll()
     }).then((reviews) => {
     // post reviews to server
+      console.log('sw posting to server')
       return Promise.all(reviews.map((review) => {
         return fetch('http://localhost:1337/reviews/', {
           method: 'POST',
@@ -87,7 +91,7 @@ function reviewOutbox (event) {
                         var tx = db.transaction('reviews', 'readwrite').objectStore('reviews')
                         tx.put({ id: review.restaurant_id, data: json })
                         console.log('BG Sync saved JSON to db')
-                        const channel = new BroadcastChannel('sw-messages')
+                        // const channel = new BroadcastChannel('sw-messages')
                         channel.postMessage({ title: 'Hello from SW' })
                       })
                   })

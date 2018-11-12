@@ -1,6 +1,7 @@
 let restaurants,
   neighborhoods,
   cuisines
+let firstLoad = true
 var newMap
 var markers = []
 /* test */
@@ -11,6 +12,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
   initMap() // added
   fetchNeighborhoods()
   fetchCuisines()
+})
+
+const channel = new BroadcastChannel('sw-messages')
+channel.addEventListener('message', event => {
+  console.log('Received', event.data)
+  location.reload()
 })
 
 /**
@@ -149,6 +156,7 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant))
   })
+
   addMarkersToMap()
 }
 
@@ -193,7 +201,7 @@ createRestaurantHTML = (restaurant) => {
 
   const more = document.createElement('button')
   more.innerHTML = 'View Details'
-  more.setAttribute('aria-labelledby', restaurant.name)
+  more.setAttribute('aria-label', `view more details for ${restaurant.name}`)
   more.onclick = function () {
     const url = DBHelper.urlForRestaurant(restaurant)
     window.location = url
@@ -205,27 +213,34 @@ createRestaurantHTML = (restaurant) => {
 
   const favoriteDiv = document.createElement('div')
   favoriteDiv.className = 'favorite-div'
+  // const favoriteLabel = document.createElement('label')
+  // favoriteLabel.innerHTML = `toggle ${restaurant.name} as a favorite`
+  // favoriteLabel.id = `${restaurant.name}-toggle`
+  // favoriteDiv.appendChild(favoriteLabel)
 
   const favoriteButton = document.createElement('button')
   favoriteButton.innerHTML = 'Add as Favorite'
   favoriteButton.setAttribute('class', 'favorite-button')
-  favoriteButton.setAttribute('aria-labelledby', 'add as favorite')
+  favoriteButton.setAttribute('aria-label', `toggle ${restaurant.name} as favorite`)
   favoriteButton.onclick = event => toggleFavorite(restaurant.id, isFavorite)
   // favoriteButton.addEventListener('click', toggleFavorite(restaurant.id, isFavorite))
   favoriteDiv.append(favoriteButton)
 
   const favoriteIcon = document.createElement('button')
   favoriteIcon.setAttribute('class', 'favorite-icon-button')
-  favoriteIcon.setAttribute('aria-labelledby', 'add as favorite')
+  favoriteIcon.setAttribute('name', `toggle ${restaurant.name} as a favorite`)
+  // favoriteIcon.id = `${restaurant.name}-toggle`
+  favoriteIcon.setAttribute('aria-hidden', `true`)
   favoriteIcon.style['background-color'] = 'transparent'
   favoriteIcon.style.border = 'transparent'
-  favoriteIcon.onClick = event => toggleFavorite(restaurant.id, favorite)
+  favoriteIcon.onclick = event => toggleFavorite(restaurant.id, isFavorite)
   const heart = document.getElementById('heart-parent').cloneNode(true)
   heart.style.display = 'inline'
+  heart.removeAttribute('id')
   favoriteIcon.appendChild(heart)
   favoriteDiv.append(favoriteIcon)
-  if (restaurant.is_favorite) {
-    heart.classList.toggle('favorite')
+  if (restaurant.is_favorite === true) {
+    heart.classList.add('favorite')
   }
   div.append(favoriteDiv)
 
