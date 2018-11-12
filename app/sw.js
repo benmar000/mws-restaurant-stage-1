@@ -26,6 +26,7 @@ var urlsToCache = [
   '/js/restaurant_info.js',
   '/js/dbhelper.js',
   '/js/sw/register.js',
+  '/js/store.js',
   '/index.html',
   '/restaurant.html'
   // '/browser-sync/browser-sync-client.js?v=2.24.7'
@@ -46,11 +47,19 @@ self.addEventListener('install', function (event) {
 
 self.addEventListener('sync', (event) => {
   console.log('sw listening to background sync')
+  if (event.tag === 'favoriteSync') {
+    //
+  } else if (event.tag === 'outbox') {
+    reviewOutbox(event)
+  }
+})
+
+function reviewOutbox (event) {
   event.waitUntil(
     store.outbox('readonly').then((outbox) => {
       return outbox.getAll()
     }).then((reviews) => {
-      // post reviews to server
+    // post reviews to server
       return Promise.all(reviews.map((review) => {
         return fetch('http://localhost:1337/reviews/', {
           method: 'POST',
@@ -88,7 +97,7 @@ self.addEventListener('sync', (event) => {
       }))
     }).catch((error) => console.log(error))
   )
-})
+}
 
 function send_message_to_all_clients (msg) {
   clients.matchAll().then(clients => {
@@ -121,8 +130,13 @@ function send_message_to_all_clients (msg) {
 self.addEventListener('fetch', function (event) {
   console.log('Service worker handling fetch request')
   var requestURL = new URL(event.request.url)
-
   if (requestURL.port === '1337') {
+    console.log('SW handling fetch to:')
+    console.log(requestURL)
+    if (requestURL.href.includes('is_favorite')) {
+      return favoriteToggle(event)
+    }
+
     var id = -1
     if (requestURL.href.match(/\d+$/)) {
       id = requestURL.href.match(/\d+$/)[0]
@@ -143,6 +157,63 @@ self.addEventListener('fetch', function (event) {
   }
 })
 
+const favoriteToggle = function (event) {
+  console.log('SW handling PUT request')
+  // console.log(event)
+  const id = event.request.url.split('/')[4]
+  console.log(`Id is: ${id}`)
+  fetch(event.request)
+    .then(response => response.json())
+    .then(json => {
+      return dbPromise
+        .then(db => {
+          const tx = db.transaction('restaurants', 'readwrite')
+          const store = tx.objectStore('restaurants')
+          return store.openCursor()
+            .then(function logItems (cursor) {
+              if (!cursor) {
+                return
+              }
+              console.log(`Restaurant id is:${id}`)
+              const cursorRestaurantId = parseInt(id) - 1
+              // for (var field in cursor.value) {
+              const updateData = cursor.value
+              console.log(updateData['data'][cursorRestaurantId].is_favorite)
+              updateData['data'][cursorRestaurantId].is_favorite = 'true'
+              cursor.update(updateData)
+              // }
+            }).then(() => console.log('Done cursoring'))
+        // store.put({ id: -1, data.id: json })
+        // console.log('saved JSON to db')
+        })
+    })
+
+  // event.respondWith(
+  //   fetch(event.request)
+  //     .then(response => response.json())
+  //     .then(json => {
+  //       return dbPromise
+  //         .then(db => {
+  //           const tx = db.transaction('restaurants', 'readwrite')
+  //           const store = tx.objectStore('restaurants')
+  //           return store.openCursor(id)
+  //             .then(cursor => {
+  //               console.log('Cursored at:', cursor.key)
+  //               for (var field in cursor.value) {
+  //                 console.log(cursor.value[field])
+  //               }
+  //               return json
+  //             }).then(() => console.log('Done cursoring'))
+  //           // store.put({ id: -1, data.id: json })
+  //           // console.log('saved JSON to db')
+  //         })
+  //     }).then((finalResponse) => {
+  //       return new Response(JSON.stringify(finalResponse))
+  //     }).catch(error => console.error(error))
+
+  // )
+}
+
 var dbRequest = function (event, id, type) {
   event.respondWith(dbPromise.then(function (db) {
     var tx = db.transaction(type)
@@ -151,8 +222,8 @@ var dbRequest = function (event, id, type) {
   }).then(function (data) {
     return (data && data.data) || fetch(event.request)
       .then(function (response) {
-        console.log('dbRequest response is: ')
-        console.log(response.clone())
+        // console.log('dbRequest response is: ')
+        // console.log(response.clone())
         return response.json()
       })
       .then(function (json) {
@@ -162,15 +233,14 @@ var dbRequest = function (event, id, type) {
             var store = tx.objectStore(type)
             store.put({ id: id, data: json })
             console.log('saved JSON to db')
-            // parseDBData(json)
             return json
           })
       })
-  }).then(function (response) {
+  }).then(function (finalResponse) {
     // var jsonString = JSON.stringify(response)
     // console.log('SW jsonString: ')
     // console.log(jsonString)
-    return new Response(JSON.stringify(response))
+    return new Response(JSON.stringify(finalResponse))
   }).catch(function (error) {
     console.error(`Received error: "${error}" when fetching data`)
     return new Response(`Received error: ${error} when fetching data`, { status: 500 })

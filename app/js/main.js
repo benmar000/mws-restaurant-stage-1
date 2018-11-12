@@ -200,7 +200,51 @@ createRestaurantHTML = (restaurant) => {
   }
   div.append(more)
 
+  // favorite handling
+  const isFavorite = restaurant.is_favorite // true or false
+
+  const favoriteDiv = document.createElement('div')
+  favoriteDiv.className = 'favorite-div'
+
+  const favoriteButton = document.createElement('button')
+  favoriteButton.innerHTML = 'Add as Favorite'
+  favoriteButton.setAttribute('class', 'favorite-button')
+  favoriteButton.setAttribute('aria-labelledby', 'add as favorite')
+  favoriteButton.onclick = event => toggleFavorite(restaurant.id, isFavorite)
+  // favoriteButton.addEventListener('click', toggleFavorite(restaurant.id, isFavorite))
+  favoriteDiv.append(favoriteButton)
+
+  const favoriteIcon = document.createElement('button')
+  favoriteIcon.setAttribute('class', 'favorite-icon-button')
+  favoriteIcon.setAttribute('aria-labelledby', 'add as favorite')
+  favoriteIcon.style['background-color'] = 'transparent'
+  favoriteIcon.style.border = 'transparent'
+  favoriteIcon.onClick = event => toggleFavorite(restaurant.id, favorite)
+  const heart = document.getElementById('heart-parent').cloneNode(true)
+  heart.style.display = 'inline'
+  favoriteIcon.appendChild(heart)
+  favoriteDiv.append(favoriteIcon)
+  if (restaurant.is_favorite) {
+    heart.classList.toggle('favorite')
+  }
+  div.append(favoriteDiv)
+
   return li
+}
+
+toggleFavorite = (id, favorite) => {
+  console.log(`toggleFavorite called on restaurant #: ${id} with favorite status: ${favorite}`)
+  if (favorite) { // unfavorite restaurant
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`,
+      { method: 'PUT' }
+    )
+    //
+  } else { // favorite restaurant
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`,
+      { method: 'PUT' }
+    ).then(response => response.json())
+      .then(json => console.log(json))
+  }
 }
 
 /**
