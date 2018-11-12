@@ -234,17 +234,15 @@ createRestaurantHTML = (restaurant) => {
 
 toggleFavorite = (id, favorite) => {
   console.log(`toggleFavorite called on restaurant #: ${id} with favorite status: ${favorite}`)
-  if (favorite) { // unfavorite restaurant
-    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`,
-      { method: 'PUT' }
-    )
+  if (favorite === true) { // unfavorite restaurant
+    console.log('Unfavoriting restaurant')
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=false`, { method: 'PUT' })
     //
   } else { // favorite restaurant
-    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`,
-      { method: 'PUT' }
-    ).then(response => response.json())
-      .then(json => console.log(json))
+    console.log('Favoriting restaurant')
+    fetch(`http://localhost:1337/restaurants/${id}/?is_favorite=true`, { method: 'PUT' })
   }
+  window.location.reload()
 }
 
 /**

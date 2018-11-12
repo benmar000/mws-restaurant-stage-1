@@ -159,7 +159,13 @@ self.addEventListener('fetch', function (event) {
 
 const favoriteToggle = function (event) {
   console.log('SW handling PUT request')
-  // console.log(event)
+  console.log(event.request)
+  let favorite
+  if (event.request.url.includes('true')) {
+    favorite = true
+  } else {
+    favorite = false
+  }
   const id = event.request.url.split('/')[4]
   console.log(`Id is: ${id}`)
   fetch(event.request)
@@ -179,7 +185,7 @@ const favoriteToggle = function (event) {
               // for (var field in cursor.value) {
               const updateData = cursor.value
               console.log(updateData['data'][cursorRestaurantId].is_favorite)
-              updateData['data'][cursorRestaurantId].is_favorite = 'true'
+              updateData['data'][cursorRestaurantId].is_favorite = favorite
               cursor.update(updateData)
               // }
             }).then(() => console.log('Done cursoring'))
